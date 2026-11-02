@@ -63,6 +63,9 @@ button:focus-visible {
   --bs-btn-active-bg: var(--seguridad-osc);
   --bs-btn-active-border-color: var(--seguridad-osc);
   --bs-btn-active-color: var(--tinta);
+  --bs-btn-disabled-bg: var(--seguridad);
+  --bs-btn-disabled-border-color: var(--seguridad);
+  --bs-btn-disabled-color: var(--tinta);
   font-weight: 600;
 }
 
@@ -134,24 +137,30 @@ button:focus-visible {
 
 /* ---------- Página en verificación de sesión ---------- */
 .verificando {
-  visibility: hidden;      /* oculta la página sin cambiar su tamaño */
+  visibility: hidden;
+  /* oculta la página sin cambiar su tamaño */
 }
 
 /* ---------- Estructura general ---------- */
 .app {
-  display: flex;           /* menú y contenido uno al lado del otro */
+  display: flex;
+  /* menú y contenido uno al lado del otro */
   min-height: 100vh;
 }
 
 .contenido {
-  flex: 1;                 /* el contenido toma todo el espacio que sobra */
-  min-width: 0;            /* evita que tablas anchas rompan el diseño */
+  flex: 1;
+  /* el contenido toma todo el espacio que sobra */
+  min-width: 0;
+  /* evita que tablas anchas rompan el diseño */
 }
 
 /* ---------- Menú lateral ---------- */
 .sidebar {
-  --bs-offcanvas-bg: var(--acero);   /* fondo del panel en celular */
-  --bs-offcanvas-width: 260px;       /* ancho del panel en celular */
+  --bs-offcanvas-bg: var(--acero);
+  /* fondo del panel en celular */
+  --bs-offcanvas-width: 260px;
+  /* ancho del panel en celular */
   color: var(--acero-texto);
 }
 
@@ -163,7 +172,8 @@ button:focus-visible {
 /* Solo en PC (desde 992 px): menú fijo a la izquierda */
 @media (min-width: 992px) {
   .sidebar {
-    position: sticky;      /* se queda quieto al bajar en la página */
+    position: sticky;
+    /* se queda quieto al bajar en la página */
     top: 0;
     width: 250px;
     height: 100vh;
@@ -186,7 +196,8 @@ button:focus-visible {
 }
 
 .sidebar .marca-sub {
-  color: var(--acero-texto);  /* en el menú oscuro, el subtítulo va más claro */
+  color: var(--acero-texto);
+  /* en el menú oscuro, el subtítulo va más claro */
 }
 
 .franja-delgada {
@@ -194,7 +205,8 @@ button:focus-visible {
 }
 
 .menu {
-  list-style: none;        /* quita las viñetas de la lista */
+  list-style: none;
+  /* quita las viñetas de la lista */
   padding: .75rem 0;
   margin: 0;
 }
@@ -206,7 +218,8 @@ button:focus-visible {
   padding: .65rem 1.25rem;
   color: var(--acero-texto);
   text-decoration: none;
-  border-left: 4px solid transparent;  /* espacio reservado para la marca de la opción activa */
+  border-left: 4px solid transparent;
+  /* espacio reservado para la marca de la opción activa */
 }
 
 .menu a:hover {
@@ -228,7 +241,8 @@ button:focus-visible {
   padding: .75rem 1rem;
   background: #fff;
   border-bottom: 1px solid var(--borde);
-  position: sticky;        /* se queda arriba al bajar en la página */
+  position: sticky;
+  /* se queda arriba al bajar en la página */
   top: 0;
   z-index: 1020;
 }
@@ -252,7 +266,8 @@ button:focus-visible {
 
 .panel-encabezado {
   display: flex;
-  flex-wrap: wrap;               /* en celular, el botón baja si no cabe */
+  flex-wrap: wrap;
+  /* en celular, el botón baja si no cabe */
   justify-content: space-between;
   align-items: center;
   gap: .75rem;
@@ -262,7 +277,8 @@ button:focus-visible {
 
 /* ---------- Tablas ---------- */
 .table {
-  --bs-table-bg: transparent;    /* la tabla toma el fondo blanco del panel */
+  --bs-table-bg: transparent;
+  /* la tabla toma el fondo blanco del panel */
 }
 
 .table thead th {
@@ -276,7 +292,8 @@ button:focus-visible {
 .codigo {
   color: var(--gris);
   white-space: nowrap;
-  font-variant-numeric: tabular-nums;  /* números del mismo ancho, se alinean mejor */
+  font-variant-numeric: tabular-nums;
+  /* números del mismo ancho, se alinean mejor */
 }
 
 /* Usuarios sin permisos de edición: se oculta la columna de acciones */
@@ -289,7 +306,8 @@ button:focus-visible {
   width: 48px;
   height: 48px;
   border-radius: 6px;
-  object-fit: cover;             /* la foto llena el cuadro sin deformarse */
+  object-fit: cover;
+  /* la foto llena el cuadro sin deformarse */
   background: var(--fondo);
   color: var(--gris);
   display: grid;
@@ -332,4 +350,49 @@ button:focus-visible {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* ---------- Indicadores (panel principal y reportes) ---------- */
+.indicador {
+  height: 100%;
+  padding: 1rem 1.1rem;
+}
+
+.indicador-titulo {
+  color: var(--gris);
+  font-weight: 500;
+}
+
+.indicador-valor {
+  margin-top: .35rem;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.indicador-detalle {
+  color: var(--gris);
+  font-size: .9rem;
+}
+
+/* ---------- Ventas: resumen de la venta actual ---------- */
+@media (min-width: 992px) {
+  .venta-actual {
+    position: sticky;      /* el resumen acompaña al bajar por el catálogo */
+    top: 5.5rem;
+  }
+}
+
+.totales > div {
+  padding: .2rem 0;
+}
+
+.totales .total {
+  margin-top: .4rem;
+  padding-top: .6rem;
+  border-top: 1px solid var(--borde);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
 }

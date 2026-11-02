@@ -1,0 +1,1 @@
+  mostrarMenu('ventas', 'Ventas', perfil);

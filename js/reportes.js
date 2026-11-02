@@ -1,0 +1,1 @@
+  mostrarMenu('reportes', 'Reportes', perfil);
