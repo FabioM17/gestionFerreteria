@@ -1,0 +1,314 @@
+:root {
+  --acero: #22303C;
+  --acero-2: #2E3F4E;
+  /* acero un poco más claro (opción activa del menú) */
+  --acero-texto: #C9D3DC;
+  /* texto claro sobre fondo acero */
+  --seguridad: #F2B705;
+  /* amarillo de seguridad (acento) */
+  --seguridad-osc: #D9A300;
+  /* amarillo oscuro (botones al pasar el mouse) */
+  --fondo: #EDF0F3;
+  /* fondo general de la página */
+  --tinta: #1C252E;
+  /* color del texto principal */
+  --gris: #5B6874;
+  /* texto secundario */
+  --borde: #D5DBE1;
+}
+
+/* Base */
+
+body {
+  background: var(--fondo);
+  color: var(--tinta);
+  font-family: 'Barlow', system-ui, sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 600;
+}
+
+/* Franja de precaucion */
+
+.franja {
+  height: 12px;
+  background: repeating-linear-gradient(-45deg,
+      var(--seguridad) 0 14px,
+      var(--acero) 14px 28px);
+}
+
+/* Accesibilidad */
+
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid var(--seguridad);
+  outline-offset: 2px;
+}
+
+/* Boton Principal */
+
+.btn-ferre {
+  --bs-btn-bg: var(--seguridad);
+  --bs-btn-border-color: var(--seguridad);
+  --bs-btn-color: var(--tinta);
+  --bs-btn-hover-bg: var(--seguridad-osc);
+  --bs-btn-hover-border-color: var(--seguridad-osc);
+  --bs-btn-hover-color: var(--tinta);
+  --bs-btn-active-bg: var(--seguridad-osc);
+  --bs-btn-active-border-color: var(--seguridad-osc);
+  --bs-btn-active-color: var(--tinta);
+  font-weight: 600;
+}
+
+/*  Logo   */
+.marca-icono {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  background: var(--seguridad);
+  color: var(--acero);
+  display: grid;
+  place-items: center;
+  /* centra el ícono vertical y horizontalmente */
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.marca-nombre {
+  display: block;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.marca-sub {
+  font-size: .82rem;
+  color: var(--gris);
+}
+
+/*  Pantalla de login  */
+.pagina-login {
+  background: var(--acero);
+}
+
+.login-contenedor {
+  min-height: 100vh;
+  /* ocupa toda la altura de la pantalla */
+  display: grid;
+  place-items: center;
+  /* centra la tarjeta en la pantalla */
+  padding: 1.5rem;
+}
+
+.login-tarjeta {
+  width: 100%;
+  max-width: 420px;
+  /* en PC no crece más de 420 px; en celular ocupa todo el ancho */
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  /* recorta la franja a las esquinas redondeadas */
+}
+
+.marca-login {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+}
+
+.datos-prueba {
+  background: var(--fondo);
+  border-radius: 6px;
+  padding: .75rem 1rem;
+  font-size: .9rem;
+
+  color: var(--gris);
+}
+
+/* ---------- Página en verificación de sesión ---------- */
+.verificando {
+  visibility: hidden;      /* oculta la página sin cambiar su tamaño */
+}
+
+/* ---------- Estructura general ---------- */
+.app {
+  display: flex;           /* menú y contenido uno al lado del otro */
+  min-height: 100vh;
+}
+
+.contenido {
+  flex: 1;                 /* el contenido toma todo el espacio que sobra */
+  min-width: 0;            /* evita que tablas anchas rompan el diseño */
+}
+
+/* ---------- Menú lateral ---------- */
+.sidebar {
+  --bs-offcanvas-bg: var(--acero);   /* fondo del panel en celular */
+  --bs-offcanvas-width: 260px;       /* ancho del panel en celular */
+  color: var(--acero-texto);
+}
+
+.sidebar-cuerpo {
+  background: var(--acero);
+  min-height: 100%;
+}
+
+/* Solo en PC (desde 992 px): menú fijo a la izquierda */
+@media (min-width: 992px) {
+  .sidebar {
+    position: sticky;      /* se queda quieto al bajar en la página */
+    top: 0;
+    width: 250px;
+    height: 100vh;
+    flex-shrink: 0;
+    overflow-y: auto;
+  }
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  padding: 1.25rem;
+  color: #fff;
+  text-decoration: none;
+}
+
+.marca:hover {
+  color: #fff;
+}
+
+.sidebar .marca-sub {
+  color: var(--acero-texto);  /* en el menú oscuro, el subtítulo va más claro */
+}
+
+.franja-delgada {
+  height: 6px;
+}
+
+.menu {
+  list-style: none;        /* quita las viñetas de la lista */
+  padding: .75rem 0;
+  margin: 0;
+}
+
+.menu a {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .65rem 1.25rem;
+  color: var(--acero-texto);
+  text-decoration: none;
+  border-left: 4px solid transparent;  /* espacio reservado para la marca de la opción activa */
+}
+
+.menu a:hover {
+  background: var(--acero-2);
+  color: #fff;
+}
+
+.menu a.activo {
+  background: var(--acero-2);
+  color: #fff;
+  font-weight: 600;
+  border-left-color: var(--seguridad);
+}
+
+/* ---------- Barra superior ---------- */
+.barra-superior {
+  display: flex;
+  align-items: center;
+  padding: .75rem 1rem;
+  background: #fff;
+  border-bottom: 1px solid var(--borde);
+  position: sticky;        /* se queda arriba al bajar en la página */
+  top: 0;
+  z-index: 1020;
+}
+
+.titulo-pagina {
+  font-size: 1.65rem;
+}
+
+@media (min-width: 992px) {
+  .barra-superior {
+    padding: .9rem 1.5rem;
+  }
+}
+
+/* ---------- Paneles ---------- */
+.panel {
+  background: #fff;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+}
+
+.panel-encabezado {
+  display: flex;
+  flex-wrap: wrap;               /* en celular, el botón baja si no cabe */
+  justify-content: space-between;
+  align-items: center;
+  gap: .75rem;
+  padding: .85rem 1rem;
+  border-bottom: 1px solid var(--borde);
+}
+
+/* ---------- Tablas ---------- */
+.table {
+  --bs-table-bg: transparent;    /* la tabla toma el fondo blanco del panel */
+}
+
+.table thead th {
+  background: #F6F8FA;
+  color: var(--gris);
+  font-weight: 600;
+  font-size: .9rem;
+  white-space: nowrap;
+}
+
+.codigo {
+  color: var(--gris);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;  /* números del mismo ancho, se alinean mejor */
+}
+
+/* Usuarios sin permisos de edición: se oculta la columna de acciones */
+.solo-lectura .acciones-admin {
+  display: none;
+}
+
+/* ---------- Miniaturas de productos ---------- */
+.miniatura {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  object-fit: cover;             /* la foto llena el cuadro sin deformarse */
+  background: var(--fondo);
+  color: var(--gris);
+  display: grid;
+  place-items: center;
+  font-size: 1.3rem;
+}
+
+/* ---------- Estados de stock ---------- */
+.badge.estado-ok {
+  background: #E3F1E7;
+  color: #1E6B3A;
+}
+
+.badge.estado-bajo {
+  background: #FDF1C7;
+  color: #7A5A00;
+}
+
+.badge.estado-agotado {
+  background: #F8DEDA;
+  color: #9B2C20;
+}
