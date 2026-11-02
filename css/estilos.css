@@ -312,3 +312,24 @@ button:focus-visible {
   background: #F8DEDA;
   color: #9B2C20;
 }
+
+/* ---------- Vista previa de la imagen en el formulario ---------- */
+.vista-previa {
+  width: 96px;
+  height: 96px;
+  flex-shrink: 0;
+  border: 2px dashed var(--borde);
+  border-radius: 8px;
+  background: var(--fondo);
+  color: var(--gris);
+  display: grid;
+  place-items: center;
+  font-size: 2rem;
+  overflow: hidden;
+}
+
+.vista-previa img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

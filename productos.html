@@ -59,7 +59,7 @@
 
     </div>
 
-    <!-- Ventana agrega / editar producto-->
+    <!-- Ventana agregar / editar producto-->
     <div class="modal fade" id="modalProducto" tabindex="-1" aria-labelledby="tituloModal" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <form id="formProducto" class="modal-content" novalidate>
@@ -139,6 +139,25 @@
                                 inputmode="numeric">
                             <div id="error-stockMinimo" class="invalid-feedback"></div>
                         </div>
+
+                        <div class="col-12">
+                            <label for="imagen" class="form-label">Imagen del producto <span
+                                    class="text-secondary">(opcional)</span></label>
+                            <div class="d-flex align-items-start gap-3">
+                                <!-- Aquí se ve la foto elegida, o un ícono si no hay -->
+                                <div id="vistaPrevia" class="vista-previa"></div>
+                                <div class="flex-grow-1">
+                                    <input type="file" id="imagen" class="form-control"
+                                        accept="image/jpeg,image/png,image/webp">
+                                    <div class="form-text">JPG, PNG o WebP de hasta 2 MB.</div>
+                                    <div id="error-imagen" class="invalid-feedback"></div>
+                                    <button type="button" id="botonQuitarImagen"
+                                        class="btn btn-link btn-sm text-danger p-0 mt-1 d-none">
+                                        Quitar imagen
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -149,6 +168,35 @@
                 </div>
 
             </form>
+        </div>
+    </div>
+
+    <!--  VENTANA: confirmar eliminación -->
+    <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="tituloEliminar" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h2 id="tituloEliminar" class="modal-title h4">Eliminar producto</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" data-bs-target="#modalEliminar"
+                        aria-label="Cerrar"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div id="alertaEliminar" class="alert alert-danger d-none" role="alert"></div>
+                    <p class="mb-0">
+                        Se eliminará <strong id="nombreEliminar"></strong> del inventario.
+                        Esta acción no se puede deshacer.
+                    </p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+                        data-bs-target="#modalEliminar">Cancelar</button>
+                    <button type="button" id="botonConfirmarEliminar" class="btn btn-danger">Eliminar producto</button>
+                </div>
+
+            </div>
         </div>
     </div>
 
