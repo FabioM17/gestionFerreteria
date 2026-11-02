@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reportes | Ferretería El Tornillo</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="css/estilos.css" rel="stylesheet">
+</head>
+<!--
+  reportes.html - Reporte de ventas del día
+  Requerimiento: 10 (total vendido y cantidad de transacciones)
+  Solo para el Administrador. La lógica está en js/reportes.js. No cambies los id.
+-->
+<body class="verificando">
+  <div class="app">
+
+    <!-- Menú lateral: lo dibuja menu.js -->
+    <aside id="menuLateral" class="offcanvas-lg offcanvas-start sidebar" tabindex="-1" aria-label="Menú"></aside>
+
+    <div class="contenido">
+      <!-- Barra superior: la dibuja menu.js -->
+      <header id="barraSuperior" class="barra-superior"></header>
+
+      <main class="p-3 p-lg-4">
+
+        <!-- Selección de fecha -->
+        <section class="panel mb-3">
+          <div class="p-3 d-flex flex-wrap align-items-end gap-2">
+            <div>
+              <label for="fechaReporte" class="form-label">Fecha del reporte</label>
+              <input type="date" id="fechaReporte" class="form-control">
+            </div>
+            <button id="botonHoy" class="btn btn-outline-secondary" type="button">Hoy</button>
+            <button id="botonImprimirReporte" class="btn btn-outline-secondary ms-auto" type="button">
+              <i class="bi bi-printer" aria-hidden="true"></i> Imprimir
+            </button>
+          </div>
+        </section>
+
+        <!-- Indicadores del día -->
+        <div class="row g-3 mb-3">
+          <div class="col-6 col-xl-3">
+            <div class="panel indicador">
+              <span class="indicador-titulo">Total vendido</span>
+              <div id="resumenTotal" class="indicador-valor">$0.00</div>
+              <div class="indicador-detalle">IVA incluido</div>
+            </div>
+          </div>
+          <div class="col-6 col-xl-3">
+            <div class="panel indicador">
+              <span class="indicador-titulo">Transacciones</span>
+              <div id="resumenTransacciones" class="indicador-valor">0</div>
+              <div class="indicador-detalle">Ventas registradas</div>
+            </div>
+          </div>
+          <div class="col-6 col-xl-3">
+            <div class="panel indicador">
+              <span class="indicador-titulo">Venta promedio</span>
+              <div id="resumenPromedio" class="indicador-valor">$0.00</div>
+              <div class="indicador-detalle">Por transacción</div>
+            </div>
+          </div>
+          <div class="col-6 col-xl-3">
+            <div class="panel indicador">
+              <span class="indicador-titulo">Artículos vendidos</span>
+              <div id="resumenArticulos" class="indicador-valor">0</div>
+              <div class="indicador-detalle">Unidades en total</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-3">
+          <!-- Ventas del día -->
+          <div class="col-xl-8">
+            <section class="panel">
+              <div class="panel-encabezado">
+                <h2 class="h5 mb-0">Ventas del día</h2>
+              </div>
+              <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th scope="col">N.º</th>
+                      <th scope="col">Hora</th>
+                      <th scope="col">Cliente</th>
+                      <th scope="col">Atendió</th>
+                      <th scope="col" class="text-end">Artículos</th>
+                      <th scope="col" class="text-end">Total</th>
+                      <th scope="col" class="text-end"><span class="visually-hidden">Detalle</span></th>
+                    </tr>
+                  </thead>
+                  <!-- Filas de ventas (las dibuja reportes.js) -->
+                  <tbody id="tablaVentas"></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+
+          <!-- Productos más vendidos -->
+          <div class="col-xl-4">
+            <section class="panel">
+              <div class="panel-encabezado">
+                <h2 class="h5 mb-0">Productos más vendidos</h2>
+              </div>
+              <!-- Lista (la dibuja reportes.js) -->
+              <ol id="listaMasVendidos" class="list-group list-group-flush list-group-numbered mb-0"></ol>
+            </section>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+  </div>
+
+  <!-- ========== VENTANA: detalle de una venta ========== -->
+  <div class="modal fade" id="modalDetalleVenta" tabindex="-1" aria-labelledby="tituloDetalleVenta" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="tituloDetalleVenta" class="modal-title h4">Detalle de la venta</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" data-bs-target="#modalDetalleVenta" aria-label="Cerrar"></button>
+        </div>
+        <!-- Contenido (lo dibuja reportes.js) -->
+        <div class="modal-body">
+          <div id="detalleVenta" class="factura"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-bs-target="#modalDetalleVenta">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/menu.js"></script>
+  <script src="js/utilidades.js"></script>
+  <script src="js/reportes.js"></script>
+</body>
+</html>
