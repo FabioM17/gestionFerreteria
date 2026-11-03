@@ -544,3 +544,94 @@ button:focus-visible {
 .cantidad input[type=number] {
   -moz-appearance: textfield;
 }
+
+/* ---------- Factura (ventas y reportes) ---------- */
+.factura-encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding-bottom: .75rem;
+  border-bottom: 3px solid var(--seguridad);
+}
+
+.factura-negocio {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.factura-datos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .25rem 1.5rem;
+  margin: .75rem 0;
+}
+
+.factura-tabla {
+  margin-bottom: .5rem;
+}
+
+.factura-totales {
+  max-width: 280px;
+  margin-left: auto;             /* los totales se alinean a la derecha */
+}
+
+.factura-totales > div {
+  display: flex;
+  justify-content: space-between;
+  padding: .15rem 0;
+}
+
+.factura-total {
+  margin-top: .3rem;
+  padding-top: .4rem !important;
+  border-top: 1px solid var(--borde);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.factura-gracias {
+  margin: 1rem 0 0;
+  color: var(--gris);
+  text-align: center;
+}
+
+/* ---------- Impresión: solo se imprime la factura ---------- */
+@media print {
+  /* Se quita todo lo que no es la ventana de la factura */
+  body.imprimiendo-factura .app,
+  body.imprimiendo-factura .modal-backdrop,
+  body.imprimiendo-factura .modal-header,
+  body.imprimiendo-factura .modal-footer,
+  body.imprimiendo-factura .toast-container {
+    display: none !important;
+  }
+
+  /* La ventana se imprime como contenido normal de la hoja */
+  body.imprimiendo-factura .modal.show {
+    position: static;
+    display: block !important;
+    overflow: visible;
+  }
+
+  body.imprimiendo-factura .modal-dialog {
+    max-width: 100%;
+    height: auto;
+    margin: 0;
+    transform: none !important;
+  }
+
+  body.imprimiendo-factura .modal-content {
+    max-height: none;
+    border: 0;
+    box-shadow: none;
+  }
+
+  body.imprimiendo-factura .modal-body {
+    overflow: visible;
+    padding: 0;
+  }
+}

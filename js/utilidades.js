@@ -134,3 +134,94 @@ function fechaISO(fecha) {
   const dia = String(fecha.getDate()).padStart(2, '0');
   return anio + '-' + mes + '-' + dia;
 }
+
+/**
+ * Convierte una fecha en texto "dd/mm/aaaa hh:mm" (hora local, formato de 24 horas).
+ * @param {Date} fecha
+ * @returns {string}
+ */
+function formatearFechaHora(fecha) {
+  const dia = String(fecha.getDate()).padStart(2, '0');
+  const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+  const hora = String(fecha.getHours()).padStart(2, '0');
+  const minutos = String(fecha.getMinutes()).padStart(2, '0');
+  return dia + '/' + mes + '/' + fecha.getFullYear() + ' ' + hora + ':' + minutos;
+}
+
+/**
+ * Arma el HTML de una factura (requerimiento 8).
+ * La usan Ventas (al registrar) y Reportes (al ver el detalle de una venta).
+ * @param {object} venta - { numero, fecha, cliente, dui, atendio, productos, subtotal,
+ *                           porcentaje, descuento, iva, total }
+ *                         productos: [{ nombre, cantidad, precio }]
+ * @returns {string}
+ */
+function htmlFactura(venta) {
+  let filas = ''; // Acumulador con las filas de productos
+
+  for (let i = 0; i < venta.productos.length; i++) {
+    const p = venta.productos[i];
+    filas += `
+      <tr>
+        <td class="text-end">${p.cantidad}</td>
+        <td>${escaparHTML(p.nombre)}</td>
+        <td class="text-end">${formatearDinero(p.precio)}</td>
+        <td class="text-end">${formatearDinero(p.precio * p.cantidad)}</td>
+      </tr>`;
+  }
+
+  const textoDescuento = venta.porcentaje > 0 ? 'Descuento (' + venta.porcentaje + ' %)' : 'Descuento';
+
+  return `
+    <div class="factura-encabezado">
+      <div>
+        <div class="factura-negocio">Ferretería El Tornillo</div>
+        <small class="text-secondary">Gestión de ferretería</small>
+      </div>
+      <div class="text-end">
+        <div class="fw-semibold">Factura N.º ${String(venta.numero).padStart(6, '0')}</div>
+        <small class="text-secondary">${formatearFechaHora(venta.fecha)}</small>
+      </div>
+    </div>
+
+    <div class="factura-datos">
+      <div><span class="text-secondary">Cliente:</span> ${escaparHTML(venta.cliente)}</div>
+      ${venta.dui ? `<div><span class="text-secondary">DUI:</span> ${escaparHTML(venta.dui)}</div>` : ''}
+      <div><span class="text-secondary">Atendió:</span> ${escaparHTML(venta.atendio)}</div>
+    </div>
+
+    <table class="table table-sm align-middle factura-tabla">
+      <thead>
+        <tr>
+          <th scope="col" class="text-end">Cant.</th>
+          <th scope="col">Producto</th>
+          <th scope="col" class="text-end">Precio</th>
+          <th scope="col" class="text-end">Importe</th>
+        </tr>
+      </thead>
+      <tbody>${filas}</tbody>
+    </table>
+
+    <div class="factura-totales">
+      <div><span>Subtotal</span><span>${formatearDinero(venta.subtotal)}</span></div>
+      <div><span>${textoDescuento}</span><span>-${formatearDinero(venta.descuento)}</span></div>
+      <div><span>IVA (13 %)</span><span>${formatearDinero(venta.iva)}</span></div>
+      <div class="factura-total"><span>Total</span><span>${formatearDinero(venta.total)}</span></div>
+    </div>
+
+    <p class="factura-gracias">¡Gracias por su compra!</p>`;
+}
+
+/**
+ * Imprime solo la factura (o el contenido marcado con la clase "factura"),
+ * no toda la página.
+ */
+function imprimirFactura() {
+  document.body.classList.add('imprimiendo-factura');
+  window.print();
+}
+
+// Al terminar de imprimir (o cancelar), la página vuelve a la normalidad
+window.addEventListener('afterprint', function () {
+  document.body.classList.remove('imprimiendo-factura');
+});

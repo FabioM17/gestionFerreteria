@@ -1,6 +1,7 @@
 /**
  * ventas.js
  * Módulo de ventas (punto de venta).
+ * Requerimientos: 5 (venta), 6 (descuentos), 7 (IVA), 8 (factura), 9 (varias ventas seguidas).
  */
 
 // ---------- Datos de la página ----------
@@ -9,6 +10,7 @@ let categorias = [];       // Categorías para los botones de filtro
 let categoriaActiva = 0;   // id de la categoría elegida (0 = todas)
 let clientes = [];         // Clientes para la lista desplegable
 let carrito = [];          // Productos de la venta actual: [{ productoId, cantidad }]
+let perfilActual = null;   // Empleado que está vendiendo (aparece en la factura)
 
 // Impuesto al valor agregado de El Salvador, en porcentaje
 const PORCENTAJE_IVA = 13;
@@ -22,6 +24,8 @@ const listaCarrito = document.getElementById('carrito');
 const selectCliente = document.getElementById('clienteVenta');
 const botonRegistrar = document.getElementById('botonRegistrarVenta');
 const botonVaciar = document.getElementById('botonVaciar');
+const alertaVenta = document.getElementById('alertaVenta');
+const ventanaFactura = new bootstrap.Modal(document.getElementById('modalFactura'));
 
 /** Prepara la página: sesión, menú y carga de datos. */
 async function iniciarPagina() {
@@ -31,6 +35,7 @@ async function iniciarPagina() {
   }
 
   mostrarMenu('ventas', 'Ventas', perfil);
+  perfilActual = perfil;
 
   await cargarCategorias();
   await cargarProductos();
@@ -337,7 +342,7 @@ function mostrarCarrito() {
   mostrarTotales();
 }
 
-//Totales descuento mas iva
+//Totales descuento e iva
 
 /**
  * Porcentaje de descuento según el monto de la compra (requerimiento 6).
@@ -412,6 +417,122 @@ function mostrarTotales() {
   const vacio = carrito.length === 0;
   botonRegistrar.disabled = vacio;
   botonVaciar.disabled = vacio;
+}
+
+//Registrar venta y Factura
+
+/**
+ * Busca un cliente por su id.
+ * @param {number} id
+ * @returns {object|undefined}
+ */
+function buscarClientePorId(id) {
+  return clientes.find(function (c) { return c.id === id; });
+}
+
+/**
+ * Muestra un error arriba de los botones de la venta.
+ * @param {string} mensaje - '' para ocultarlo.
+ */
+function mostrarErrorVenta(mensaje) {
+  alertaVenta.textContent = mensaje;
+  alertaVenta.classList.toggle('d-none', mensaje === '');
+}
+
+/** Guarda la venta en Supabase y muestra la factura. */
+async function registrarVenta() {
+  mostrarErrorVenta('');
+
+  if (carrito.length === 0) {
+    mostrarErrorVenta('Agrega al menos un producto a la venta.');
+    return;
+  }
+
+  const clienteId = Number(selectCliente.value);
+  const totales = calcularTotales();
+
+  // Lista de productos para la base de datos y para la factura
+  const productosVenta = [];
+  const lineasFactura = [];
+  for (let i = 0; i < carrito.length; i++) {
+    const item = carrito[i];
+    const producto = buscarProductoPorId(item.productoId);
+
+    productosVenta.push({
+      producto_id: producto.id,
+      cantidad: item.cantidad,
+      precio_unitario: producto.precio
+    });
+    lineasFactura.push({
+      nombre: producto.nombre,
+      cantidad: item.cantidad,
+      precio: producto.precio
+    });
+  }
+
+  botonRegistrar.disabled = true;
+  botonRegistrar.textContent = 'Registrando…';
+
+  // La función de Supabase guarda todo junto, o nada si algo falla
+  const { data: numeroVenta, error } = await db.rpc('registrar_venta', {
+    p_cliente_id: clienteId,
+    p_productos: productosVenta,
+    p_subtotal: totales.subtotal,
+    p_descuento: totales.descuento,
+    p_iva: totales.iva,
+    p_total: totales.total
+  });
+
+  botonRegistrar.innerHTML = '<i class="bi bi-receipt" aria-hidden="true"></i> Registrar venta';
+  botonRegistrar.disabled = false;
+
+  if (error) {
+    console.error('Error al registrar la venta:', error);
+
+    // Los errores "VN..." vienen de nuestra función, con un mensaje ya claro
+    if (error.code && error.code.startsWith('VN')) {
+      mostrarErrorVenta(error.message);
+      // El stock o el precio cambió: recargamos los productos y recalculamos
+      await cargarProductos();
+      mostrarCarrito();
+    } else if (error.code === '42501') {
+      mostrarErrorVenta('Tu sesión terminó. Vuelve a iniciar sesión.');
+    } else {
+      mostrarErrorVenta('No se pudo registrar la venta. Revisa tu conexión e intenta de nuevo.');
+    }
+    return;
+  }
+
+  // Venta guardada: mostramos la factura
+  const cliente = buscarClientePorId(clienteId);
+  document.getElementById('factura').innerHTML = htmlFactura({
+    numero: numeroVenta,
+    fecha: new Date(),
+    cliente: cliente.nombre,
+    dui: cliente.dui,
+    atendio: perfilActual.nombre,
+    productos: lineasFactura,
+    subtotal: totales.subtotal,
+    porcentaje: totales.porcentaje,
+    descuento: totales.descuento,
+    iva: totales.iva,
+    total: totales.total
+  });
+  ventanaFactura.show();
+
+  // El stock cambió: actualizamos el catálogo
+  await cargarProductos();
+}
+
+/** Deja todo listo para atender al siguiente cliente (requerimiento 9). */
+function nuevaVenta() {
+  carrito = [];
+  selectCliente.selectedIndex = 0;
+  buscarProducto.value = '';
+  mostrarErrorVenta('');
+  filtrarCatalogo();
+  mostrarCarrito();
+  ventanaFactura.hide();
 }
 
 // ---------- Eventos ----------
@@ -494,6 +615,18 @@ listaCarrito.addEventListener('change', function (evento) {
 botonVaciar.addEventListener('click', function () {
   carrito = [];
   mostrarCarrito();
+});
+
+// Botón "Registrar venta"
+botonRegistrar.addEventListener('click', registrarVenta);
+
+// Botones de la ventana de la factura
+document.getElementById('botonImprimir').addEventListener('click', imprimirFactura);
+document.getElementById('botonNuevaVenta').addEventListener('click', nuevaVenta);
+
+// Al cerrar la factura, el cursor queda en el buscador para la siguiente venta
+document.getElementById('modalFactura').addEventListener('hidden.bs.modal', function () {
+  buscarProducto.focus();
 });
 
 iniciarPagina();
