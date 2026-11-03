@@ -379,12 +379,13 @@ button:focus-visible {
 /* ---------- Ventas: resumen de la venta actual ---------- */
 @media (min-width: 992px) {
   .venta-actual {
-    position: sticky;      /* el resumen acompaña al bajar por el catálogo */
+    position: sticky;
+    /* el resumen acompaña al bajar por el catálogo */
     top: 5.5rem;
   }
 }
 
-.totales > div {
+.totales>div {
   padding: .2rem 0;
 }
 
@@ -395,4 +396,108 @@ button:focus-visible {
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 1.5rem;
   font-weight: 700;
+}
+
+/* ---------- Ventas: filtro de categorías ---------- */
+.filtro-categorias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+.btn-filtro {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .35rem .8rem;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  /* forma de píldora */
+  background: #fff;
+  color: var(--tinta);
+  font-size: .9rem;
+}
+
+.btn-filtro:hover {
+  border-color: var(--acero);
+}
+
+.btn-filtro.activo {
+  background: var(--acero);
+  border-color: var(--acero);
+  color: #fff;
+}
+
+/* ---------- Ventas: tarjetas del catálogo ---------- */
+.tarjeta-producto {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tarjeta-producto.agotado {
+  opacity: .6;
+}
+
+.tarjeta-imagen {
+  aspect-ratio: 1 / 1;
+  /* cuadro perfecto, sin importar el ancho */
+  background: #fff;
+  border-bottom: 1px solid var(--borde);
+  display: grid;
+  place-items: center;
+  font-size: 2.5rem;
+  color: var(--gris);
+}
+
+.tarjeta-imagen img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* la foto completa, sin recortar */
+  padding: .5rem;
+}
+
+.tarjeta-cuerpo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: .15rem;
+  padding: .75rem;
+}
+
+.tarjeta-nombre {
+  margin: 0;
+  font-family: 'Barlow', system-ui, sans-serif;
+  font-size: .95rem;
+  font-weight: 600;
+  line-height: 1.25;
+  /* Máximo 2 líneas; si el nombre es más largo, termina en "…" */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tarjeta-precio {
+  margin: .35rem 0;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.tarjeta-precio small {
+  font-family: 'Barlow', system-ui, sans-serif;
+  font-size: .75rem;
+  font-weight: 400;
+  color: var(--gris);
+}
+
+.tarjeta-producto .btn {
+  margin-top: auto;
+  /* el botón siempre queda abajo de la tarjeta */
 }
