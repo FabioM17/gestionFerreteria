@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clientes | Ferretería El Tornillo</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="css/estilos.css" rel="stylesheet">
+</head>
+<!--
+  clientes.html - Módulo de clientes
+  Requerimientos: 1 (registro de clientes), 2 (validación de DUI, edad y teléfono), 3 (búsqueda)
+  La lógica está en js/clientes.js. No cambies los id: el JavaScript los usa.
+-->
+<body class="verificando">
+  <div class="app">
+
+    <!-- Menú lateral: lo dibuja menu.js -->
+    <aside id="menuLateral" class="offcanvas-lg offcanvas-start sidebar" tabindex="-1" aria-label="Menú"></aside>
+
+    <div class="contenido">
+      <!-- Barra superior: la dibuja menu.js -->
+      <header id="barraSuperior" class="barra-superior"></header>
+
+      <main class="p-3 p-lg-4">
+        <section class="panel">
+
+          <div class="panel-encabezado">
+            <p id="contador" class="mb-0 text-secondary"></p>
+            <button id="botonNuevoCliente" class="btn btn-ferre" type="button">
+              <i class="bi bi-person-plus" aria-hidden="true"></i> Nuevo cliente
+            </button>
+          </div>
+
+          <!-- Buscador -->
+          <div class="p-3 border-bottom">
+            <label for="buscarCliente" class="visually-hidden">Buscar cliente</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-search" aria-hidden="true"></i></span>
+              <input type="search" id="buscarCliente" class="form-control"
+                     placeholder="Buscar por nombre, DUI o teléfono" autocomplete="off">
+            </div>
+          </div>
+
+          <!-- Lista de clientes (las filas las dibuja clientes.js) -->
+          <div class="table-responsive">
+            <table id="tablaListaClientes" class="table align-middle mb-0">
+              <thead>
+                <tr>
+                  <th scope="col">Cliente</th>
+                  <th scope="col">DUI</th>
+                  <th scope="col" class="text-end">Edad</th>
+                  <th scope="col">Teléfono</th>
+                  <th scope="col">Correo</th>
+                  <th scope="col" class="text-end">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tablaClientes"></tbody>
+            </table>
+          </div>
+
+        </section>
+      </main>
+    </div>
+
+  </div>
+
+  <!-- ========== VENTANA: agregar / editar cliente ========== -->
+  <div class="modal fade" id="modalCliente" tabindex="-1" aria-labelledby="tituloModalCliente" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <form id="formCliente" class="modal-content" novalidate>
+
+        <div class="modal-header">
+          <h2 id="tituloModalCliente" class="modal-title h4">Nuevo cliente</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" data-bs-target="#modalCliente" aria-label="Cerrar"></button>
+        </div>
+
+        <div class="modal-body">
+          <div id="alertaCliente" class="alert alert-danger d-none" role="alert"></div>
+
+          <div class="row g-3">
+            <div class="col-md-8">
+              <label for="nombreCliente" class="form-label">Nombre completo</label>
+              <input type="text" id="nombreCliente" class="form-control" maxlength="80" autocomplete="off">
+              <div id="error-nombreCliente" class="invalid-feedback"></div>
+            </div>
+
+            <div class="col-md-4">
+              <label for="dui" class="form-label">DUI</label>
+              <input type="text" id="dui" class="form-control" maxlength="10" inputmode="numeric" placeholder="00000000-0" autocomplete="off">
+              <div id="error-dui" class="invalid-feedback"></div>
+            </div>
+
+            <div class="col-md-4">
+              <label for="fechaNacimiento" class="form-label">Fecha de nacimiento</label>
+              <input type="date" id="fechaNacimiento" class="form-control">
+              <div class="form-text" id="edadCalculada"></div>
+              <div id="error-fechaNacimiento" class="invalid-feedback"></div>
+            </div>
+
+            <div class="col-md-4">
+              <label for="telefono" class="form-label">Teléfono</label>
+              <input type="tel" id="telefono" class="form-control" maxlength="9" inputmode="numeric" placeholder="0000-0000" autocomplete="off">
+              <div id="error-telefono" class="invalid-feedback"></div>
+            </div>
+
+            <div class="col-md-4">
+              <label for="correo" class="form-label">Correo <span class="text-secondary">(opcional)</span></label>
+              <input type="email" id="correo" class="form-control" maxlength="80" autocomplete="off">
+              <div id="error-correo" class="invalid-feedback"></div>
+            </div>
+
+            <div class="col-12">
+              <label for="direccion" class="form-label">Dirección <span class="text-secondary">(opcional)</span></label>
+              <textarea id="direccion" class="form-control" rows="2" maxlength="150"></textarea>
+              <div id="error-direccion" class="invalid-feedback"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-bs-target="#modalCliente">Cancelar</button>
+          <button type="submit" id="botonGuardarCliente" class="btn btn-ferre">Guardar cliente</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- ========== VENTANA: confirmar eliminación ========== -->
+  <div class="modal fade" id="modalEliminarCliente" tabindex="-1" aria-labelledby="tituloEliminarCliente" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h2 id="tituloEliminarCliente" class="modal-title h4">Eliminar cliente</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" data-bs-target="#modalEliminarCliente" aria-label="Cerrar"></button>
+        </div>
+
+        <div class="modal-body">
+          <div id="alertaEliminarCliente" class="alert alert-danger d-none" role="alert"></div>
+          <p class="mb-0">
+            Se eliminará a <strong id="nombreEliminarCliente"></strong> de la lista de clientes.
+            Esta acción no se puede deshacer.
+          </p>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-bs-target="#modalEliminarCliente">Cancelar</button>
+          <button type="button" id="botonConfirmarEliminarCliente" class="btn btn-danger">Eliminar cliente</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/menu.js"></script>
+  <script src="js/utilidades.js"></script>
+  <script src="js/clientes.js"></script>
+</body>
+</html>
