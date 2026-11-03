@@ -109,3 +109,28 @@ function mostrarAviso(mensaje) {
         aviso.remove();
     });
 }
+
+/**
+ * Prepara un texto para comparar en búsquedas: minúsculas y sin tildes.
+ * Así "Jose" encuentra a "José" y "MARIA" encuentra a "María".
+ * @param {string} texto
+ * @returns {string}
+ */
+function normalizar(texto) {
+  return String(texto)
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
+/**
+ * Convierte una fecha en texto con formato AAAA-MM-DD, usando la hora local.
+ * Es el formato que usan los campos <input type="date">.
+ * @param {Date} fecha
+ * @returns {string}
+ */
+function fechaISO(fecha) {
+  const anio = fecha.getFullYear();
+  const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+  const dia = String(fecha.getDate()).padStart(2, '0');
+  return anio + '-' + mes + '-' + dia;
+}
