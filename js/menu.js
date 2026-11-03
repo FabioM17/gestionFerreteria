@@ -6,12 +6,14 @@
 
 // Opciones del menú. "soloAdmin" indica si el cajero NO debe verla.
 const OPCIONES_MENU = [
-  { id: 'inicio',    texto: 'Inicio',    icono: 'bi-house',     url: 'inicio.html',    soloAdmin: false },
-  { id: 'productos', texto: 'Productos', icono: 'bi-box-seam',  url: 'productos.html', soloAdmin: false },
-  { id: 'clientes',  texto: 'Clientes',  icono: 'bi-people',    url: 'clientes.html',  soloAdmin: false },
-  { id: 'ventas',    texto: 'Ventas',    icono: 'bi-cart3',     url: 'ventas.html',    soloAdmin: false },
-  { id: 'reportes',  texto: 'Reportes',  icono: 'bi-bar-chart', url: 'reportes.html',  soloAdmin: true }
+  { id: 'inicio', texto: 'Inicio', icono: 'bi-house', url: 'inicio.html', soloAdmin: false },
+  { id: 'productos', texto: 'Productos', icono: 'bi-box-seam', url: 'productos.html', soloAdmin: false },
+  { id: 'clientes', texto: 'Clientes', icono: 'bi-people', url: 'clientes.html', soloAdmin: false },
+  { id: 'ventas', texto: 'Ventas', icono: 'bi-cart3', url: 'ventas.html', soloAdmin: false },
+  { id: 'reportes', texto: 'Reportes', icono: 'bi-bar-chart', url: 'reportes.html', soloAdmin: true },
+  { id: 'usuarios', texto: 'Usuarios', icono: 'bi-person-gear', url: 'usuarios.html', soloAdmin: true }
 ];
+
 
 /**
  * Dibuja el menú lateral y la barra superior, y muestra la página.
