@@ -24,7 +24,6 @@ async function iniciarPagina() {
     return;
   }
 
-  // Requerimiento 11: el reporte es solo para el Administrador.
   // El cajero que escriba la dirección a mano vuelve al inicio.
   if (!esAdministrador(perfil)) {
     location.replace('inicio.html');

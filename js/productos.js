@@ -39,6 +39,11 @@ const ventanaProducto = new bootstrap.Modal(document.getElementById('modalProduc
 const ventanaEliminar = new bootstrap.Modal(document.getElementById('modalEliminar'));
 const alertaEliminar = document.getElementById('alertaEliminar');
 const botonConfirmarEliminar = document.getElementById('botonConfirmarEliminar');
+const buscarInventario = document.getElementById('buscarInventario');
+const filtroCategoria = document.getElementById('filtroCategoria');
+const filtroMarca = document.getElementById('filtroMarca');
+const filtroEstado = document.getElementById('filtroEstado');
+const alertaStock = document.getElementById('alertaStock');
 
 /** Prepara la página: sesión, menú, permisos y carga de datos. */
 async function iniciarPagina() {
@@ -77,8 +82,9 @@ async function cargarProductos() {
     }
 
     productos = data;
-    mostrarProductos(productos);
     llenarMarcas();
+    filtrarProductos();
+    mostrarAlertaStock();
 }
 
 /**
@@ -99,7 +105,7 @@ function mostrarMensajeTabla(mensaje) {
  */
 function mostrarProductos(lista) {
     if (lista.length === 0) {
-        mostrarMensajeTabla('No hay productos para mostrar.');
+        mostrarMensajeTabla('No hay productos que coincidan con la búsqueda.');
         return;
     }
 
@@ -155,6 +161,71 @@ function miniatura(producto, categoria) {
     return `<span class="miniatura"><i class="bi ${iconoCategoria(categoria)}" aria-hidden="true"></i></span>`;
 }
 
+//Busqueda, Filtro y alerta de inventario
+
+/** Muestra solo los productos que cumplen con la búsqueda y los tres filtros. */
+function filtrarProductos() {
+    const texto = normalizar(buscarInventario.value.trim());
+    const categoriaId = Number(filtroCategoria.value);   // 0 = todas
+    const marca = filtroMarca.value;                     // '' = todas
+    const estadoElegido = filtroEstado.value;            // '' = todos
+    const resultado = [];
+
+    for (let i = 0; i < productos.length; i++) {
+        const producto = productos[i];
+        const estado = estadoStock(producto).texto;
+
+        const coincideTexto = texto === ''
+            || normalizar(producto.nombre).includes(texto)
+            || normalizar(producto.codigo).includes(texto);
+        const coincideCategoria = categoriaId === 0 || producto.categoria_id === categoriaId;
+        const coincideMarca = marca === '' || producto.marca === marca;
+
+        // "Por reabastecer" junta los dos estados que necesitan compra
+        let coincideEstado;
+        if (estadoElegido === 'reabastecer') {
+            coincideEstado = estado === 'Stock bajo' || estado === 'Agotado';
+        } else {
+            coincideEstado = estadoElegido === '' || estado === estadoElegido;
+        }
+
+        // Operador lógico &&: el producto se muestra solo si cumple TODO
+        if (coincideTexto && coincideCategoria && coincideMarca && coincideEstado) {
+            resultado.push(producto);
+        }
+    }
+
+    mostrarProductos(resultado);
+}
+
+/** Avisa cuántos productos están agotados o con stock bajo (requerimiento 4). */
+function mostrarAlertaStock() {
+    let agotados = 0;   // Contadores
+    let bajos = 0;
+
+    for (let i = 0; i < productos.length; i++) {
+        const estado = estadoStock(productos[i]).texto;
+        if (estado === 'Agotado') {
+            agotados = agotados + 1;
+        } else if (estado === 'Stock bajo') {
+            bajos = bajos + 1;
+        }
+    }
+
+    const total = agotados + bajos;
+    if (total === 0) {
+        alertaStock.classList.add('d-none');
+        return;
+    }
+
+    alertaStock.innerHTML = `
+    <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+    <strong>${total} ${total === 1 ? 'producto necesita' : 'productos necesitan'} reabastecerse:</strong>
+    ${agotados} agotado${agotados === 1 ? '' : 's'} y ${bajos} con stock bajo.
+    <button type="button" id="botonVerReabastecer" class="btn btn-sm btn-link p-0 align-baseline">Ver productos</button>`;
+    alertaStock.classList.remove('d-none');
+}
+
 //Formulario, cargar y editar productos
 
 /** Carga las categorías desde Supabase y llena la lista desplegable. */
@@ -173,6 +244,7 @@ async function cargarCategorias() {
     const lista = document.getElementById('categoria');
     for (let i = 0; i < categorias.length; i++) {
         lista.add(new Option(categorias[i].nombre, categorias[i].id));
+        filtroCategoria.add(new Option(categorias[i].nombre, categorias[i].id));
     }
 }
 
@@ -199,6 +271,15 @@ function llenarMarcas() {
     for (let i = 0; i < marcas.length; i++) {
         lista.appendChild(new Option(marcas[i]));
     }
+
+
+    // También llenamos el filtro de marcas, sin perder la marca que estaba elegida
+    const marcaElegida = filtroMarca.value;
+    filtroMarca.innerHTML = '<option value="">Todas las marcas</option>';
+    for (let i = 0; i < marcas.length; i++) {
+        filtroMarca.add(new Option(marcas[i], marcas[i]));
+    }
+    filtroMarca.value = marcas.includes(marcaElegida) ? marcaElegida : '';
 }
 
 /**
@@ -581,6 +662,24 @@ async function eliminarProducto(producto) {
 }
 
 // ---------- Eventos ----------
+
+
+// Búsqueda (con cada letra) y filtros (al elegir una opción)
+buscarInventario.addEventListener('input', filtrarProductos);
+filtroCategoria.addEventListener('change', filtrarProductos);
+filtroMarca.addEventListener('change', filtrarProductos);
+filtroEstado.addEventListener('change', filtrarProductos);
+
+// "Ver productos" de la alerta: muestra solo los que hay que reabastecer
+alertaStock.addEventListener('click', function (evento) {
+    if (evento.target.id === 'botonVerReabastecer') {
+        buscarInventario.value = '';
+        filtroCategoria.value = '0';
+        filtroMarca.value = '';
+        filtroEstado.value = 'reabastecer';
+        filtrarProductos();
+    }
+});
 
 // Botón "Nuevo producto"
 document.getElementById('botonNuevo').addEventListener('click', function () {

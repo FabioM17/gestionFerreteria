@@ -35,6 +35,43 @@
                         </button>
                     </div>
 
+                    <!-- Alerta de inventario (requerimiento 4). La llena productos.js -->
+                    <div id="alertaStock" class="alert alert-warning mx-3 mt-3 mb-0 d-none" role="status"></div>
+
+                    <!-- Búsqueda y filtros (requerimiento 3) -->
+                    <div class="row g-2 p-3">
+                        <div class="col-12 col-xl-3">
+                            <label for="buscarInventario" class="visually-hidden">Buscar producto</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-search" aria-hidden="true"></i></span>
+                                <input type="search" id="buscarInventario" class="form-control"
+                                    placeholder="Nombre o código">
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-4 col-xl-3">
+                            <label for="filtroCategoria" class="visually-hidden">Categoría</label>
+                            <select id="filtroCategoria" class="form-select">
+                                <option value="0">Todas las categorías</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-sm-4 col-xl-3">
+                            <label for="filtroMarca" class="visually-hidden">Marca</label>
+                            <select id="filtroMarca" class="form-select">
+                                <option value="">Todas las marcas</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-sm-4 col-xl-3">
+                            <label for="filtroEstado" class="visually-hidden">Estado del inventario</label>
+                            <select id="filtroEstado" class="form-select">
+                                <option value="">Todos los estados</option>
+                                <option value="Disponible">Disponible</option>
+                                <option value="Stock bajo">Stock bajo</option>
+                                <option value="Agotado">Agotado</option>
+                                <option value="reabastecer">Por reabastecer</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="table-responsive">
                         <table id="tablaInventario" class="table align-middle mb-0">
                             <thead>
