@@ -9,6 +9,8 @@ let categorias = [];      // Lista de categorías cargada desde Supabase
 let idEditando = null;    // id del producto que se edita (null = producto nuevo)
 let codigoSugerido = '';  // Último código que el sistema sugirió
 let productoEliminando = null; // Producto que se va a eliminar (espera confirmación)
+let productoFicha = null;      // Producto que se está viendo en la ficha
+let puedeEditar = false;       // true si el usuario es Administrador
 
 // Unidades de venta disponibles (lista fija)
 const UNIDADES = ['Unidad', 'Caja', 'Libra', 'Metro', 'Galón', 'Bolsa'];
@@ -44,6 +46,7 @@ const filtroCategoria = document.getElementById('filtroCategoria');
 const filtroMarca = document.getElementById('filtroMarca');
 const filtroEstado = document.getElementById('filtroEstado');
 const alertaStock = document.getElementById('alertaStock');
+const ventanaFicha = new bootstrap.Modal(document.getElementById('modalFicha'));
 
 /** Prepara la página: sesión, menú, permisos y carga de datos. */
 async function iniciarPagina() {
@@ -55,7 +58,8 @@ async function iniciarPagina() {
     mostrarMenu('productos', 'Productos', perfil);
 
     // Solo el administrador puede agregar, editar o eliminar
-    if (esAdministrador(perfil)) {
+    puedeEditar = esAdministrador(perfil);
+    if (puedeEditar) {
         document.getElementById('botonNuevo').classList.remove('d-none');
     } else {
         document.getElementById('tablaInventario').classList.add('solo-lectura');
@@ -122,7 +126,8 @@ function mostrarProductos(lista) {
         <td>${miniatura(producto, categoria)}</td>
         <td class="codigo">${escaparHTML(producto.codigo)}</td>
         <td>
-          <div class="fw-semibold">${nombre}</div>
+                    <button type="button" class="btn btn-link p-0 fw-semibold text-start text-reset" data-accion="ver"
+                  data-id="${producto.id}" aria-label="Ver ficha de ${nombre}">${nombre}</button>
           <small class="text-secondary">${escaparHTML(producto.marca)} · ${escaparHTML(producto.unidad)}</small>
         </td>
         <td>${escaparHTML(categoria)}</td>
@@ -224,6 +229,66 @@ function mostrarAlertaStock() {
     ${agotados} agotado${agotados === 1 ? '' : 's'} y ${bajos} con stock bajo.
     <button type="button" id="botonVerReabastecer" class="btn btn-sm btn-link p-0 align-baseline">Ver productos</button>`;
     alertaStock.classList.remove('d-none');
+}
+
+// FICHA DEL PRODUCTO (toda su información en una ventana)
+
+/**
+ * Llena y abre la ventana con la ficha de un producto.
+ * El costo y la ganancia solo los ve el Administrador.
+ * @param {object} producto
+ */
+function mostrarFicha(producto) {
+    productoFicha = producto;
+    const categoria = producto.categorias ? producto.categorias.nombre : 'Sin categoría';
+    const estado = estadoStock(producto);
+    const nombre = escaparHTML(producto.nombre);
+
+    // Imagen grande, o el ícono de la categoría si no tiene
+    let imagen;
+    if (producto.imagen_url) {
+        imagen = `<img src="${escaparHTML(producto.imagen_url)}" alt="Foto de ${nombre}">`;
+    } else {
+        imagen = `<i class="bi ${iconoCategoria(categoria)}" aria-hidden="true"></i>`;
+    }
+
+    // Datos que ve cualquier empleado
+    let datos = `
+      <dt>Código</dt>          <dd class="codigo">${escaparHTML(producto.codigo)}</dd>
+      <dt>Marca</dt>           <dd>${escaparHTML(producto.marca)}</dd>
+      <dt>Categoría</dt>       <dd>${escaparHTML(categoria)}</dd>
+      <dt>Unidad de venta</dt> <dd>${escaparHTML(producto.unidad)}</dd>
+      <dt>Precio de venta</dt> <dd class="fw-semibold">${formatearDinero(producto.precio)}</dd>
+      <dt>Stock</dt>           <dd>${producto.stock} <small class="text-secondary">(mínimo ${producto.stock_minimo})</small></dd>
+      <dt>Estado</dt>          <dd><span class="badge ${estado.clase}">${estado.texto}</span></dd>`;
+
+    // Datos del negocio: solo para el Administrador
+    if (puedeEditar) {
+        // Operadores aritméticos: ganancia, margen y valor del inventario
+        const ganancia = producto.precio - producto.costo;
+        const margen = producto.precio > 0 ? (ganancia / producto.precio) * 100 : 0;
+        const valorInventario = producto.stock * producto.costo;
+
+        datos += `
+      <dt>Costo</dt>               <dd>${formatearDinero(producto.costo)}</dd>
+      <dt>Ganancia por unidad</dt> <dd>${formatearDinero(ganancia)} <small class="text-secondary">(${margen.toFixed(1)} % del precio)</small></dd>
+      <dt>Valor en inventario</dt> <dd>${formatearDinero(valorInventario)} <small class="text-secondary">(stock × costo)</small></dd>`;
+    }
+
+    document.getElementById('fichaProducto').innerHTML = `
+      <div class="row g-4">
+        <div class="col-md-5">
+          <div class="ficha-imagen">${imagen}</div>
+        </div>
+        <div class="col-md-7">
+          <h3 class="h4 mb-3">${nombre}</h3>
+          <dl class="ficha-datos">${datos}</dl>
+        </div>
+      </div>`;
+
+    // El botón "Editar producto" solo aparece para el Administrador
+    document.getElementById('botonEditarFicha').classList.toggle('d-none', !puedeEditar);
+    ventanaFicha.show();
 }
 
 //Formulario, cargar y editar productos
@@ -757,6 +822,9 @@ tablaProductos.addEventListener('click', function (evento) {
     const producto = productos.find(function (p) { return p.id === id; });
 
     switch (boton.dataset.accion) {
+        case 'ver':
+            mostrarFicha(producto);
+            break;
         case 'editar':
             abrirFormulario(producto);
             break;
@@ -764,6 +832,15 @@ tablaProductos.addEventListener('click', function (evento) {
             confirmarEliminacion(producto);
             break;
     }
+});
+
+// Botón "Editar producto" de la ficha: primero se cierra la ficha y, cuando
+// terminó de cerrarse, se abre el formulario (abrir dos ventanas a la vez las traba)
+document.getElementById('botonEditarFicha').addEventListener('click', function () {
+    document.getElementById('modalFicha').addEventListener('hidden.bs.modal', function () {
+        abrirFormulario(productoFicha);
+    }, { once: true });
+    ventanaFicha.hide();
 });
 
 // Envío del formulario

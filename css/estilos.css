@@ -635,3 +635,38 @@ button:focus-visible {
     padding: 0;
   }
 }
+
+/* ---------- Ficha del producto ---------- */
+.ficha-imagen {
+  aspect-ratio: 1 / 1;             /* cuadro perfecto en cualquier pantalla */
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--gris);
+  display: grid;
+  place-items: center;
+  font-size: 4rem;                 /* tamaño del ícono cuando no hay foto */
+  overflow: hidden;
+}
+
+.ficha-imagen img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;             /* se ve el producto completo, sin recortes */
+}
+
+.ficha-datos {
+  display: grid;
+  grid-template-columns: auto 1fr; /* etiqueta | valor */
+  gap: .5rem 1rem;
+  margin: 0;
+}
+
+.ficha-datos dt {
+  color: var(--gris);
+  font-weight: 500;
+}
+
+.ficha-datos dd {
+  margin: 0;
+}
