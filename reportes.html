@@ -13,8 +13,7 @@
   <link href="css/estilos.css" rel="stylesheet">
 </head>
 <!--
-  reportes.html - Reporte de ventas del día
-  Requerimiento: 10 (total vendido y cantidad de transacciones)
+  reportes.html - Reporte de ventas por día, rango de fechas, mes o año
   Solo para el Administrador. La lógica está en js/reportes.js. No cambies los id.
 -->
 <body class="verificando">
@@ -29,21 +28,77 @@
 
       <main class="p-3 p-lg-4">
 
-        <!-- Selección de fecha -->
-        <section class="panel mb-3">
-          <div class="p-3 d-flex flex-wrap align-items-end gap-2">
-            <div>
-              <label for="fechaReporte" class="form-label">Fecha del reporte</label>
-              <input type="date" id="fechaReporte" class="form-control">
+        <!-- Encabezado que SOLO sale al imprimir: d-none lo oculta en pantalla, d-print-flex lo muestra en papel -->
+        <div class="encabezado-impresion d-none d-print-flex">
+          <span class="marca-icono"><i class="bi bi-tools" aria-hidden="true"></i></span>
+          <div>
+            <div class="factura-negocio">Ferretería El Tornillo</div>
+            <div class="text-secondary">Reporte de ventas <span id="periodoImpresion"></span></div>
+          </div>
+        </div>
+
+        <!-- Elección del período (no se imprime) -->
+        <section class="panel mb-3 d-print-none">
+          <div class="p-3">
+            <div class="row g-2 align-items-end">
+
+              <div class="col-12 col-sm-6 col-lg-3">
+                <label for="tipoReporte" class="form-label">Tipo de reporte</label>
+                <select id="tipoReporte" class="form-select">
+                  <option value="dia">Un día</option>
+                  <option value="rango">Rango de fechas</option>
+                  <option value="mes">Un mes</option>
+                  <option value="anio">Un año</option>
+                </select>
+              </div>
+
+              <!-- Un día -->
+              <div id="controlesDia" class="col-12 col-sm-6 col-lg-3">
+                <label for="fechaReporte" class="form-label">Fecha</label>
+                <input type="date" id="fechaReporte" class="form-control">
+              </div>
+
+              <!-- Rango de fechas -->
+              <div id="controlesRango" class="col-12 col-lg-5 d-none">
+                <div class="row g-2">
+                  <div class="col-6">
+                    <label for="fechaDesde" class="form-label">Desde</label>
+                    <input type="date" id="fechaDesde" class="form-control">
+                  </div>
+                  <div class="col-6">
+                    <label for="fechaHasta" class="form-label">Hasta</label>
+                    <input type="date" id="fechaHasta" class="form-control">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Un mes (el año se elige en la lista de al lado) -->
+              <div id="controlesMes" class="col-6 col-lg-3 d-none">
+                <label for="mesReporte" class="form-label">Mes</label>
+                <select id="mesReporte" class="form-select"></select>
+              </div>
+
+              <!-- Año: se usa para "Un mes" y para "Un año" -->
+              <div id="controlesAnio" class="col-6 col-lg-2 d-none">
+                <label for="anioReporte" class="form-label">Año</label>
+                <select id="anioReporte" class="form-select"></select>
+              </div>
+
+              <!-- Atajos e impresión -->
+              <div class="col-12 col-lg d-flex flex-wrap gap-2 justify-content-lg-end">
+                <button id="botonHoy" class="btn btn-outline-secondary" type="button">Hoy</button>
+                <button id="botonSemana" class="btn btn-outline-secondary" type="button">Esta semana</button>
+                <button id="botonImprimirReporte" class="btn btn-outline-secondary" type="button">
+                  <i class="bi bi-printer" aria-hidden="true"></i> Imprimir
+                </button>
+              </div>
             </div>
-            <button id="botonHoy" class="btn btn-outline-secondary" type="button">Hoy</button>
-            <button id="botonImprimirReporte" class="btn btn-outline-secondary ms-auto" type="button">
-              <i class="bi bi-printer" aria-hidden="true"></i> Imprimir
-            </button>
+
+            <div id="alertaFiltro" class="alert alert-warning mt-3 mb-0 d-none" role="alert"></div>
           </div>
         </section>
 
-        <!-- Indicadores del día -->
+        <!-- Indicadores del período -->
         <div class="row g-3 mb-3">
           <div class="col-6 col-xl-3">
             <div class="panel indicador">
@@ -75,19 +130,48 @@
           </div>
         </div>
 
+        <!-- Gráficos (los dibuja reportes.js con Chart.js) -->
+        <div class="row g-3 mb-3">
+          <div class="col-xl-8">
+            <section class="panel h-100">
+              <div class="panel-encabezado">
+                <h2 id="tituloGraficoVentas" class="h5 mb-0">Ventas por hora</h2>
+              </div>
+              <div class="p-3">
+                <div class="grafico">
+                  <canvas id="graficoVentas" role="img" aria-label="Gráfico de barras con el total vendido en el período"></canvas>
+                </div>
+              </div>
+            </section>
+          </div>
+          <div class="col-xl-4">
+            <section class="panel h-100">
+              <div class="panel-encabezado">
+                <h2 class="h5 mb-0">Ventas por categoría</h2>
+              </div>
+              <div class="p-3">
+                <div class="grafico">
+                  <canvas id="graficoCategorias" role="img" aria-label="Gráfico circular con lo vendido por categoría"></canvas>
+                </div>
+                <p class="small text-secondary mt-2 mb-0">Precio × cantidad, antes de descuento e IVA.</p>
+              </div>
+            </section>
+          </div>
+        </div>
+
         <div class="row g-3">
-          <!-- Ventas del día -->
+          <!-- Ventas del período -->
           <div class="col-xl-8">
             <section class="panel">
               <div class="panel-encabezado">
-                <h2 class="h5 mb-0">Ventas del día</h2>
+                <h2 class="h5 mb-0">Ventas del período</h2>
               </div>
               <div class="table-responsive">
                 <table class="table align-middle mb-0">
                   <thead>
                     <tr>
                       <th scope="col">N.º</th>
-                      <th scope="col">Hora</th>
+                      <th scope="col">Fecha</th>
                       <th scope="col">Cliente</th>
                       <th scope="col">Atendió</th>
                       <th scope="col" class="text-end">Artículos</th>
@@ -119,7 +203,7 @@
 
   </div>
 
-  <!-- ========== VENTANA: detalle de una venta ========== -->
+  <!-- VENTANA: detalle de una venta -->
   <div class="modal fade" id="modalDetalleVenta" tabindex="-1" aria-labelledby="tituloDetalleVenta" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
       <div class="modal-content">
@@ -139,6 +223,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
   <script src="js/auth.js"></script>

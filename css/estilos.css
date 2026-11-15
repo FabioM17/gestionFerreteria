@@ -670,3 +670,33 @@ button:focus-visible {
 .ficha-datos dd {
   margin: 0;
 }
+
+/* ---------- Reportes: gráficos ---------- */
+.grafico {
+  position: relative;   /* Chart.js necesita un contenedor con alto fijo */
+  height: 280px;
+}
+
+/* ---------- Impresión del reporte ---------- */
+.encabezado-impresion {
+  align-items: center;
+  gap: .75rem;
+  padding-bottom: .75rem;
+  margin-bottom: 1rem;
+  border-bottom: 3px solid var(--seguridad);
+}
+
+@media print {
+  /* Fuera del papel: menú lateral, barra superior y botones */
+  body:not(.imprimiendo-factura) .sidebar,
+  body:not(.imprimiendo-factura) .barra-superior,
+  body:not(.imprimiendo-factura) main button {
+    display: none !important;
+  }
+
+  /* Los navegadores no imprimen fondos de color; esto conserva el amarillo del logo */
+  .encabezado-impresion .marca-icono {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
