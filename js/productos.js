@@ -729,21 +729,21 @@ async function eliminarProducto(producto) {
 // ---------- Eventos ----------
 
 
-// Búsqueda (con cada letra) y filtros (al elegir una opción)
-buscarInventario.addEventListener('input', filtrarProductos);
-filtroCategoria.addEventListener('change', filtrarProductos);
-filtroMarca.addEventListener('change', filtrarProductos);
-filtroEstado.addEventListener('change', filtrarProductos);
+// Búsqueda y filtros, con jQuery:
+// $('#id') selecciona el elemento y .on() le conecta un evento.
+// Un solo selector con comas conecta los tres filtros a la vez.
+$('#buscarInventario').on('input', filtrarProductos);
+$('#filtroCategoria, #filtroMarca, #filtroEstado').on('change', filtrarProductos);
 
-// "Ver productos" de la alerta: muestra solo los que hay que reabastecer
-alertaStock.addEventListener('click', function (evento) {
-    if (evento.target.id === 'botonVerReabastecer') {
-        buscarInventario.value = '';
-        filtroCategoria.value = '0';
-        filtroMarca.value = '';
-        filtroEstado.value = 'reabastecer';
-        filtrarProductos();
-    }
+// "Ver productos" de la alerta: muestra solo los que hay que reabastecer.
+// Delegación con jQuery: el botón se crea después con innerHTML, por eso el evento
+// se pone en la alerta y el segundo parámetro dice a qué hijo responder.
+$('#alertaStock').on('click', '#botonVerReabastecer', function () {
+    $('#buscarInventario').val('');      // .val() cambia el valor de un campo
+    $('#filtroCategoria').val('0');
+    $('#filtroMarca').val('');
+    $('#filtroEstado').val('reabastecer');
+    filtrarProductos();
 });
 
 // Botón "Nuevo producto"

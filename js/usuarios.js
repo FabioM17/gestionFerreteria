@@ -202,8 +202,8 @@ function mostrarErrores(errores) {
  * @param {string} mensaje - '' para ocultarlo.
  */
 function mostrarAlerta(mensaje) {
-  alertaUsuario.textContent = mensaje;
-  alertaUsuario.classList.toggle('d-none', mensaje === '');
+  // jQuery permite encadenar: pone el texto y luego muestra u oculta la alerta
+  $('#alertaUsuario').text(mensaje).toggleClass('d-none', mensaje === '');
 }
 
 /** Abre la ventana con el formulario vacío. */
@@ -250,7 +250,7 @@ async function crearUsuario(datos) {
 // ---------- Eventos ----------
 
 // Botón "Nuevo usuario"
-document.getElementById('botonNuevoUsuario').addEventListener('click', abrirFormulario);
+$('#botonNuevoUsuario').on('click', abrirFormulario);   // con jQuery
 
 // Al abrir la ventana, el cursor va al primer campo
 document.getElementById('modalUsuario').addEventListener('shown.bs.modal', function () {

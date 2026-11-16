@@ -145,7 +145,7 @@ function mostrarCatalogo(lista) {
     const textoStock = agotado ? 'Agotado' : 'Disponibles: ' + producto.stock;
 
     tarjetas += `
-      <div class="col-6 col-md-4 col-xl-3">
+      <div class="col-6 col-lg-4 col-xl-3">
         <article class="tarjeta-producto ${agotado ? 'agotado' : ''}">
           <div class="tarjeta-imagen">${imagenProducto(producto, categoria)}</div>
           <div class="tarjeta-cuerpo">

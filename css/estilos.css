@@ -377,11 +377,12 @@ button:focus-visible {
 }
 
 /* ---------- Ventas: resumen de la venta actual ---------- */
-@media (min-width: 992px) {
+@media (min-width: 768px) {
   .venta-actual {
-    position: sticky;
-    /* el resumen acompaña al bajar por el catálogo */
-    top: 5.5rem;
+    position: sticky;            /* el resumen acompaña al bajar por el catálogo */
+    top: 5.5rem;                 /* queda debajo de la barra superior */
+    max-height: calc(100vh - 6.5rem);  /* nunca más alto que la pantalla */
+    overflow-y: auto;            /* si no cabe, se desplaza por dentro */
   }
 }
 
